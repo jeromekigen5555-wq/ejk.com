@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZYNX — Future Forward</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #111119;
+            --surface2: #181825;
+            --accent: #a855f7;
+            --accent2: #06b6d4;
+            --text: #e2e2f0;
+            --text2: #a0a0b8;
+            --border: #1e1e2e;
+            --nav-bg: rgba(10, 10, 18, 0.75);
+            --glow: 0 0 40px rgba(168, 85, 247, 0.25);
+            --glow-cyan: 0 0 40px rgba(6, 182, 212, 0.25);
+            --radius: 14px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: #a855f7 #0a0a0f; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0f; }
+        ::-webkit-scrollbar-thumb { background: #a855f7; border-radius: 3px; }
+        body {
+            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        #bgCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        nav {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 1000; background: var(--nav-bg); backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border);
+            border-radius: 50px; padding: 8px 12px; display: flex; align-items: center;
+            gap: 6px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); transition: all var(--transition);
+        }
+        nav.scrolled { top: 8px; padding: 6px 10px; background: rgba(10,10,18,0.9); }
+        .nav-brand {
+            font-weight: 800; font-size: 1.4rem; letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; margin-right: 8px; cursor: pointer; user-select: none; text-decoration: none;
+        }
+        nav a {
+            text-decoration: none; color: var(--text2); padding: 10px 18px;
+            border-radius: 30px; font-weight: 600; font-size: 0.9rem; letter-spacing: 0.5px;
+            transition: all var(--transition); white-space: nowrap; cursor: pointer;
+        }
+        nav a:hover, nav a.active { color: #fff; background: var(--surface2); box-shadow: 0 0 20px rgba(168,85,247,0.2); }
+        nav a.active { background: rgba(168,85,247,0.2); color: #fff; }
+        .nav-right { margin-left: auto; display: flex; gap: 5px; }
+        #logoutBtn { display: none; background: none; border: 1px solid var(--accent); color: var(--accent); padding: 8px 16px; border-radius: 30px; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: all var(--transition); }
+        #logoutBtn:hover { background: rgba(168,85,247,0.15); box-shadow: var(--glow); }
+        .page { display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 120px 30px 60px; position: relative; z-index: 1; }
+        .page.active { display: flex; flex-direction: column; }
+        .container { max-width: 1100px; width: 100%; z-index: 2; }
+        #page-home { text-align: center; gap: 20px; }
+        .hero-badge { display: inline-block; padding: 8px 20px; border-radius: 30px; background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.3); color: var(--accent); font-weight: 600; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; }
+        #page-home h1 { font-size: clamp(3rem, 7vw, 6rem); font-weight: 900; letter-spacing: -2px; line-height: 1.05; background: linear-gradient(180deg, #ffffff 0%, #c4b5fd 50%, #67e8f9 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-subtitle { font-size: 1.25rem; color: var(--text2); max-width: 600px; margin: 0 auto; }
+        .trusted-section { margin-top: 30px; color: var(--text2); font-size: 0.9rem; letter-spacing: 1px; }
+        .trusted-logos { display: flex; gap: 30px; justify-content: center; margin-top: 15px; font-size: 2rem; flex-wrap: wrap; }
+        .hero-cta { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-top: 30px; }
+        .btn { padding: 14px 32px; border-radius: 50px; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.5px; cursor: pointer; border: none; transition: all var(--transition); text-decoration: none; display: inline-block; }
+        .btn-primary { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; box-shadow: var(--glow); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 0 60px rgba(168,85,247,0.45); }
+        .btn-outline { background: transparent; border: 2px solid var(--accent2); color: var(--accent2); }
+        .btn-outline:hover { background: rgba(6,182,212,0.1); box-shadow: var(--glow-cyan); transform: translateY(-3px); }
+        .btn-shop { background: linear-gradient(135deg, #06b6d4, #0e7490); border: none; color: #fff; box-shadow: var(--glow-cyan); }
+        .btn-shop:hover { transform: translateY(-3px); box-shadow: 0 0 60px rgba(6,182,212,0.5); }
+        .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-bottom: 60px; }
+        .about-text h2 { font-size: 2.8rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 20px; background: linear-gradient(135deg, #fff, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .about-text p { color: var(--text2); font-size: 1.05rem; margin-bottom: 16px; }
+        .stats-row { display: flex; gap: 30px; margin-top: 30px; flex-wrap: wrap; }
+        .stat { text-align: center; } .stat-number { font-size: 2.5rem; font-weight: 900; color: var(--accent); letter-spacing: -1px; } .stat-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text2); }
+        .glow-orb { width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(168,85,247,0.35) 0%, rgba(6,182,212,0.15) 40%, transparent 70%); animation: orbPulse 4s ease-in-out infinite; box-shadow: 0 0 100px rgba(168,85,247,0.3); }
+        @keyframes orbPulse { 0%,100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.2); opacity: 1; } }
+        .team-section { margin-top: 60px; text-align: center; } .team-section h3 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 30px; }
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 24px; justify-items: center; }
+        .team-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 18px; text-align: center; transition: var(--transition); }
+        .team-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: var(--glow); }
+        .team-avatar { font-size: 4rem; margin-bottom: 12px; } .team-name { font-weight: 700; color: #fff; } .team-role { color: var(--text2); font-size: 0.85rem; }
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 24px; margin-top: 40px; }
+        .service-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 36px 28px; text-align: center; transition: all var(--transition); position: relative; overflow: hidden; }
+        .service-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(168,85,247,0.08) 0%, transparent 60%); opacity: 0; transition: opacity var(--transition); }
+        .service-card:hover::before { opacity: 1; } .service-card:hover { transform: translateY(-8px); border-color: rgba(168,85,247,0.5); box-shadow: 0 20px 50px rgba(0,0,0,0.5), var(--glow); }
+        .service-icon { font-size: 3rem; margin-bottom: 16px; } .service-card h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: #fff; } .service-card p { color: var(--text2); font-size: 0.9rem; }
+        .section-title { font-size: 2.8rem; font-weight: 800; letter-spacing: -1px; text-align: center; margin-bottom: 10px; background: linear-gradient(135deg, #fff, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .section-subtitle { text-align: center; color: var(--text2); margin-bottom: 20px; font-size: 1rem; }
+        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap: 24px; margin-top: 40px; }
+        .portfolio-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: all var(--transition); cursor: pointer; }
+        .portfolio-card:hover { transform: translateY(-6px); border-color: rgba(6,182,212,0.5); box-shadow: 0 20px 50px rgba(0,0,0,0.5), var(--glow-cyan); }
+        .portfolio-img { height: 200px; background: linear-gradient(135deg, #1a1025, #0d1f2d); display: flex; align-items: center; justify-content: center; font-size: 4rem; position: relative; overflow: hidden; }
+        .portfolio-img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(10,10,18,0.9) 100%); }
+        .portfolio-card .card-body { padding: 20px 24px; } .portfolio-card h3 { font-weight: 700; color: #fff; } .portfolio-card p { color: var(--text2); font-size: 0.85rem; }
+        .portfolio-tag { display: inline-block; padding: 4px 12px; border-radius: 20px; background: rgba(168,85,247,0.15); color: var(--accent); font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-top: 10px; }
+        .contact-form { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+        .contact-form input, .contact-form textarea { width: 100%; padding: 16px 20px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); color: #fff; font-size: 1rem; font-family: inherit; transition: all var(--transition); resize: vertical; }
+        .contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 25px rgba(168,85,247,0.2); }
+        .contact-form textarea { min-height: 140px; } .contact-form button { align-self: flex-start; }
+        .contact-info-row { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: 40px; }
+        .contact-info-item { display: flex; align-items: center; gap: 10px; color: var(--text2); font-size: 0.9rem; } .contact-info-item .ci-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .login-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px 36px; max-width: 400px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.6); text-align: center; }
+        .login-box h2 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; background: linear-gradient(135deg, #fff, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .login-box input { width: 100%; padding: 14px 18px; margin-bottom: 16px; border-radius: 40px; background: var(--surface2); border: 1px solid var(--border); color: #fff; font-size: 0.95rem; transition: var(--transition); }
+        .login-box input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(168,85,247,0.25); outline: none; }
+        .dashboard-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 50px 40px; max-width: 600px; width: 100%; margin: 0 auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5); text-align: center; }
+        footer { text-align: center; padding: 40px 30px; color: var(--text2); font-size: 0.8rem; letter-spacing: 1px; border-top: 1px solid var(--border); position: relative; z-index: 1; } footer span { color: var(--accent); font-weight: 700; }
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.7s ease-out; } .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* Shop specific */
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-top: 40px; }
+        .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 30px 20px; text-align: center; transition: all var(--transition); display: flex; flex-direction: column; align-items: center; }
+        .product-card:hover { transform: translateY(-6px); border-color: var(--accent2); box-shadow: var(--glow-cyan); }
+        .product-emoji { font-size: 4rem; margin-bottom: 16px; }
+        .product-title { font-weight: 700; font-size: 1.1rem; color: #fff; margin-bottom: 8px; }
+        .product-price { color: var(--accent2); font-weight: 700; font-size: 1.3rem; margin-bottom: 16px; }
+        .btn-add { background: linear-gradient(135deg, #06b6d4, #0e7490); color: #fff; padding: 12px 24px; border: none; border-radius: 50px; font-weight: 700; cursor: pointer; transition: var(--transition); }
+        .btn-add:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(6,182,212,0.5); }
+        .cart-panel { position: fixed; top: 0; right: -400px; width: 360px; height: 100vh; background: var(--surface); border-left: 1px solid var(--border); z-index: 1001; backdrop-filter: blur(30px); transition: right 0.4s ease; padding: 30px 20px; display: flex; flex-direction: column; }
+        .cart-panel.open { right: 0; }
+        .cart-panel h3 { font-size: 1.5rem; margin-bottom: 20px; color: var(--accent2); }
+        .cart-items { flex: 1; overflow-y: auto; margin-bottom: 20px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); color: var(--text2); }
+        .cart-item button { background: none; border: none; color: #f87171; cursor: pointer; font-size: 1.2rem; }
+        .cart-total { font-size: 1.2rem; font-weight: 700; margin: 10px 0; display: flex; justify-content: space-between; }
+        .btn-checkout { width: 100%; background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; padding: 14px; border-radius: 50px; font-weight: 700; border: none; cursor: pointer; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none; }
+        .overlay.show { display: block; }
+        .cart-trigger { position: fixed; bottom: 30px; right: 30px; background: var(--accent2); color: #fff; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; cursor: pointer; box-shadow: var(--glow-cyan); z-index: 99; transition: var(--transition); }
+        .cart-trigger:hover { transform: scale(1.1); }
+        #shop-cart-count { position: absolute; top: -4px; right: -4px; background: var(--accent); color: #fff; font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+
+        @media (max-width:768px) {
+            nav { top: 10px; padding: 6px 8px; gap: 2px; } nav a { padding: 8px 13px; font-size: 0.78rem; }
+            .about-grid { grid-template-columns: 1fr; } .glow-orb { width: 180px; height: 180px; }
+            .section-title { font-size: 2rem; } #page-home h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bgCanvas"></canvas>
+    <nav id="navbar">
+        <a class="nav-brand" href="#home">ZYNX</a>
+        <a href="#home" class="nav-link" data-page="home">Home</a>
+        <a href="#about" class="nav-link" data-page="about">About</a>
+        <a href="#services" class="nav-link" data-page="services">Services</a>
+        <a href="#portfolio" class="nav-link" data-page="portfolio">Portfolio</a>
+        <a href="#shop" class="nav-link" data-page="shop">Shop</a>
+        <a href="#contact" class="nav-link" data-page="contact">Contact</a>
+        <div class="nav-right">
+            <a href="#login" class="nav-link" id="loginLink" data-page="login">Login</a>
+            <a href="#dashboard" class="nav-link" id="dashboardLink" data-page="dashboard" style="display:none;">Dashboard</a>
+            <button id="logoutBtn">Logout</button>
+        </div>
+    </nav>
+
+    <!-- PAGE: HOME -->
+    <div id="page-home" class="page active">
+        <div class="container">
+            <span class="hero-badge">🚀 Next-Gen Technology</span>
+            <h1>Beyond the<br>Digital Horizon</h1>
+            <p class="hero-subtitle">ZYNX fuses cutting-edge design with powerful technology to build experiences that redefine what's possible on the web and beyond.</p>
+            <div class="trusted-section reveal"><p>TRUSTED BY INNOVATORS WORLDWIDE</p><div class="trusted-logos"><span>🌐</span><span>⚡</span><span>🔷</span><span>✨</span><span>🚀</span></div></div>
+            <div class="hero-cta">
+                <a href="#services" class="btn btn-primary">Explore Services</a>
+                <a href="#shop" class="btn btn-shop">🛍️ Visit Shop</a>
+                <a href="#contact" class="btn btn-outline">Get In Touch</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: ABOUT -->
+    <div id="page-about" class="page">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-text reveal">
+                    <h2>Who We Are</h2>
+                    <p>ZYNX was born from a passion for innovation. We are a collective of designers, engineers, and visionaries dedicated to crafting digital products that push boundaries.</p>
+                    <p>From immersive web experiences to robust backend architecture, we deliver solutions that are as beautiful as they are performant.</p>
+                    <div class="stats-row">
+                        <div class="stat"><div class="stat-number">150+</div><div class="stat-label">Projects</div></div>
+                        <div class="stat"><div class="stat-number">40+</div><div class="stat-label">Clients</div></div>
+                        <div class="stat"><div class="stat-number">99%</div><div class="stat-label">Satisfaction</div></div>
+                    </div>
+                </div>
+                <div class="about-visual reveal"><div class="glow-orb"></div></div>
+            </div>
+            <div class="team-section reveal"><h3>Meet the Team</h3>
+                <div class="team-grid">
+                    <div class="team-card"><div class="team-avatar">👩‍💻</div><div class="team-name">Elena Vasquez</div><div class="team-role">CEO & Founder</div></div>
+                    <div class="team-card"><div class="team-avatar">🧑‍🔬</div><div class="team-name">Marcus Chen</div><div class="team-role">CTO</div></div>
+                    <div class="team-card"><div class="team-avatar">🎨</div><div class="team-name">Aria Nguyen</div><div class="team-role">Creative Director</div></div>
+                    <div class="team-card"><div class="team-avatar">🤖</div><div class="team-name">David Okafor</div><div class="team-role">Lead AI Engineer</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: SERVICES -->
+    <div id="page-services" class="page">
+        <div class="container">
+            <h2 class="section-title reveal">What We Do</h2>
+            <p class="section-subtitle reveal">End-to-end digital solutions tailored to accelerate your growth</p>
+            <div class="services-grid">
+                <div class="service-card reveal"><span class="service-icon">🎨</span><h3>UI/UX Design</h3><p>Stunning interfaces that captivate users.</p></div>
+                <div class="service-card reveal"><span class="service-icon">⚡</span><h3>Web Development</h3><p>High-performance websites and apps.</p></div>
+                <div class="service-card reveal"><span class="service-icon">📱</span><h3>Mobile Apps</h3><p>Native and cross-platform experiences.</p></div>
+                <div class="service-card reveal"><span class="service-icon">🔮</span><h3>AI Integration</h3><p>Intelligent solutions powered by ML.</p></div>
+                <div class="service-card reveal"><span class="service-icon">☁️</span><h3>Cloud & DevOps</h3><p>Reliable infrastructure and pipelines.</p></div>
+                <div class="service-card reveal"><span class="service-icon">🛡️</span><h3>Cybersecurity</h3><p>Enterprise-grade security monitoring.</p></div>
+                <div class="service-card reveal"><span class="service-icon">📊</span><h3>Data Analytics</h3><p>Actionable insights from complex data.</p></div>
+                <div class="service-card reveal"><span class="service-icon">🎥</span><h3>Motion & 3D</h3><p>Immersive animations and 3D experiences.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: PORTFOLIO -->
+    <div id="page-portfolio" class="page">
+        <div class="container">
+            <h2 class="section-title reveal">Featured Work</h2>
+            <p class="section-subtitle reveal">A glimpse into the future we've already built</p>
+            <div class="portfolio-grid">
+                <div class="portfolio-card reveal"><div class="portfolio-img">🌌</div><div class="card-body"><h3>Nebula Dashboard</h3><p>Real-time analytics platform.</p><span class="portfolio-tag">SaaS</span></div></div>
+                <div class="portfolio-card reveal"><div class="portfolio-img">🛒</div><div class="card-body"><h3>LuxeCommerce</h3><p>Premium e-commerce experience.</p><span class="portfolio-tag">E-Commerce</span></div></div>
+                <div class="portfolio-card reveal"><div class="portfolio-img">🎮</div><div class="card-body"><h3>RealmQuest</h3><p>Immersive gaming platform.</p><span class="portfolio-tag">Gaming</span></div></div>
+                <div class="portfolio-card reveal"><div class="portfolio-img">🏦</div><div class="card-body"><h3>FinFlow</h3><p>Modern fintech app.</p><span class="portfolio-tag">FinTech</span></div></div>
+                <div class="portfolio-card reveal"><div class="portfolio-img">🎧</div><div class="card-body"><h3>WaveStream</h3><p>Music streaming service.</p><span class="portfolio-tag">Media</span></div></div>
+                <div class="portfolio-card reveal"><div class="portfolio-img">🤖</div><div class="card-body"><h3>SynthAI</h3><p>AI content generation tool.</p><span class="portfolio-tag">AI</span></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: SHOP -->
+    <div id="page-shop" class="page">
+        <div class="container">
+            <h2 class="section-title reveal">ZYNX Store</h2>
+            <p class="section-subtitle reveal">Gear up with the future. Free shipping on orders over $100.</p>
+            <div class="shop-grid" id="shop-products"></div>
+        </div>
+        <!-- Cart trigger button -->
+        <div class="cart-trigger" onclick="toggleCart()">
+            🛒
+            <span id="shop-cart-count">0</span>
+        </div>
+        <!-- Overlay -->
+        <div class="overlay" id="cart-overlay" onclick="toggleCart()"></div>
+        <!-- Cart panel -->
+        <div class="cart-panel" id="cart-panel">
+            <h3>Your Cart</h3>
+            <div class="cart-items" id="cart-items"></div>
+            <div class="cart-total"><span>Total</span><span id="cart-total">$0.00</span></div>
+            <button class="btn-checkout" onclick="checkout()">Checkout</button>
+        </div>
+    </div>
+
+    <!-- PAGE: CONTACT -->
+    <div id="page-contact" class="page">
+        <div class="container">
+            <h2 class="section-title reveal">Let's Connect</h2>
+            <p class="reveal" style="text-align:center; color: var(--text2); margin-bottom:30px;">Have a project in mind? We'd love to hear about it.</p>
+            <form class="contact-form reveal" onsubmit="handleContactSubmit(event)">
+                <input type="text" placeholder="Your Name" required>
+                <input type="email" placeholder="Email Address" required>
+                <input type="text" placeholder="Subject">
+                <textarea placeholder="Tell us about your project..." required></textarea>
+                <button type="submit" class="btn btn-primary">Send Message ✦</button>
+            </form>
+            <div class="contact-info-row reveal">
+                <div class="contact-info-item"><div class="ci-icon">📧</div><span>hello@zynx.io</span></div>
+                <div class="contact-info-item"><div class="ci-icon">📍</div><span>San Francisco, CA</span></div>
+                <div class="contact-info-item"><div class="ci-icon">💬</div><span>@zynxHQ</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: LOGIN -->
+    <div id="page-login" class="page">
+        <div class="login-box reveal">
+            <h2>Welcome Back</h2>
+            <p>Sign in to your ZYNX account</p>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <input type="text" id="username" placeholder="Username" required autocomplete="off">
+                <input type="password" id="password" placeholder="Password" required>
+                <p class="error-msg" id="loginError" style="color:#f87171;display:none;">Invalid username or password.</p>
+                <button type="submit" class="btn btn-primary">Sign In</button>
+            </form>
+            <p style="margin-top:20px;font-size:0.8rem;color:var(--text2);">Demo: enter any username & password</p>
+        </div>
+    </div>
+
+    <!-- PAGE: DASHBOARD -->
+    <div id="page-dashboard" class="page">
+        <div class="dashboard-card reveal">
+            <h2>Dashboard</h2>
+            <p class="welcome-msg">Welcome back, <strong id="userDisplay">User</strong>! You're now logged into the ZYNX experience.</p>
+            <p style="color:var(--text2); margin-bottom:30px;">This is your private space. More features coming soon.</p>
+            <button class="btn btn-outline" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <footer><p>&copy; 2026 <span>ZYNX</span>. All rights reserved. Crafted with precision.</p></footer>
+
+    <script>
+        // ============ BACKGROUND ANIMATION ============
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [], mouse = {x:null,y:null,radius:140};
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resize(); window.addEventListener('resize',()=>{resize();initParticles();});
+        class Particle {
+            constructor() { this.reset(); this.y = Math.random()*canvas.height; }
+            reset() { this.x = Math.random()*canvas.width; this.y = -10; this.size = Math.random()*2.5+0.8; this.speedX = (Math.random()-0.5)*0.4; this.speedY = Math.random()*0.6+0.15; this.opacity = Math.random()*0.7+0.2; this.hue = Math.random()<0.5?270:190; }
+            update() {
+                this.x += this.speedX; this.y += this.speedY;
+                if(mouse.x&&mouse.y){ const dx=this.x-mouse.x,dy=this.y-mouse.y,dist=Math.sqrt(dx*dx+dy*dy); if(dist<mouse.radius){ const force=(mouse.radius-dist)/mouse.radius,angle=Math.atan2(dy,dx); this.x+=Math.cos(angle)*force*1.5; this.y+=Math.sin(angle)*force*1.5; } }
+                if(this.y>canvas.height+20||this.x<-20||this.x>canvas.width+20){ this.reset(); this.y=-10; }
+            }
+            draw() { ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fillStyle = this.hue===270?`rgba(168,85,247,${this.opacity})`:`rgba(6,182,212,${this.opacity})`; ctx.shadowBlur=8; ctx.shadowColor=this.hue===270?'rgba(168,85,247,0.5)':'rgba(6,182,212,0.5)'; ctx.fill(); ctx.shadowBlur=0; }
+        }
+        function initParticles() { const cnt = Math.min(Math.floor((canvas.width*canvas.height)/9000),180); particles=[]; for(let i=0;i<cnt;i++) particles.push(new Particle()); }
+        initParticles();
+        function animate() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            const grad=ctx.createRadialGradient(canvas.width/2,canvas.height/2,canvas.width*0.3,canvas.width/2,canvas.height/2,canvas.width*0.85);
+            grad.addColorStop(0,'rgba(10,10,18,0)'); grad.addColorStop(1,'rgba(10,10,18,0.55)');
+            ctx.fillStyle=grad; ctx.fillRect(0,0,canvas.width,canvas.height);
+            particles.forEach(p=>{p.update();p.draw();});
+            for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++){
+                const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, dist=Math.sqrt(dx*dx+dy*dy);
+                if(dist<90){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle=`rgba(148,120,200,${(1-dist/90)*0.25})`; ctx.lineWidth=0.5; ctx.stroke(); }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+        window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
+        window.addEventListener('mouseleave',()=>{mouse.x=null;mouse.y=null;});
+
+        // ============ MULTI-PAGE ROUTING ============
+        const pages = document.querySelectorAll('.page');
+        const navLinks = document.querySelectorAll('.nav-link');
+        function showPage(id) {
+            pages.forEach(p=>p.classList.remove('active'));
+            document.getElementById(`page-${id}`).classList.add('active');
+            navLinks.forEach(l=>l.classList.remove('active'));
+            document.querySelector(`.nav-link[data-page="${id}"]`)?.classList.add('active');
+            window.scrollTo({top:0,behavior:'smooth'});
+            setTimeout(()=>{
+                document.querySelectorAll('.reveal').forEach(el=>{ if(el.closest('.page.active')) el.classList.add('visible'); });
+            },100);
+        }
+        function handleRoute() {
+            const hash = window.location.hash.substring(1) || 'home';
+            if(hash==='dashboard' && !isLoggedIn()){ window.location.hash='#login'; return; }
+            if(hash==='login' && isLoggedIn()){ window.location.hash='#dashboard'; return; }
+            showPage(hash);
+            updateNavVisibility();
+        }
+        function updateNavVisibility() {
+            const logged = isLoggedIn();
+            document.getElementById('loginLink').style.display = logged ? 'none' : 'inline-block';
+            document.getElementById('dashboardLink').style.display = logged ? 'inline-block' : 'none';
+            document.getElementById('logoutBtn').style.display = logged ? 'inline-block' : 'none';
+        }
+        window.addEventListener('hashchange',handleRoute);
+        window.addEventListener('load',()=>{
+            if(!window.location.hash) window.location.hash='#home';
+            handleRoute();
+        });
+        document.addEventListener('click',e=>{
+            if(e.target.matches('a[href^="#"]')){ e.preventDefault(); window.location.hash = e.target.getAttribute('href').substring(1); }
+        });
+
+        // ============ AUTH ============
+        function isLoggedIn() { return sessionStorage.getItem('zynxLoggedIn')==='true'; }
+        function login(u) { sessionStorage.setItem('zynxLoggedIn','true'); sessionStorage.setItem('zynxUsername',u); updateNavVisibility(); window.location.hash='#dashboard'; }
+        function logout() { sessionStorage.removeItem('zynxLoggedIn'); sessionStorage.removeItem('zynxUsername'); updateNavVisibility(); window.location.hash='#home'; }
+        document.getElementById('logoutBtn').addEventListener('click',logout);
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('username').value.trim(), p = document.getElementById('password').value.trim();
+            if(!u||!p){ document.getElementById('loginError').style.display='block'; return; }
+            login(u);
+        }
+        function updateDashboardUser() {
+            if(isLoggedIn()) document.getElementById('userDisplay').textContent = sessionStorage.getItem('zynxUsername')||'User';
+        }
+        window.addEventListener('hashchange',updateDashboardUser);
+
+        // ============ CONTACT FORM ============
+        function handleContactSubmit(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.textContent='✓ Message Sent!'; btn.style.background='linear-gradient(135deg,#06b6d4,#0891b2)'; btn.disabled=true;
+            setTimeout(()=>{ btn.textContent='Send Message ✦'; btn.style.background=''; btn.disabled=false; e.target.reset(); },2500);
+        }
+
+        // ============ SHOP LOGIC ============
+        const products = [
+            { id:1, name:"Quantum Headphones", price:299.99, emoji:"🎧" },
+            { id:2, name:"Neon Drone X1", price:799.00, emoji:"🛸" },
+            { id:3, name:"HoloLens Lite", price:1299.50, emoji:"👓" },
+            { id:4, name:"Cyberpunk Backpack", price:189.00, emoji:"🎒" },
+            { id:5, name:"AI Smartwatch", price:449.99, emoji:"⌚" },
+            { id:6, name:"Nano Drone Mini", price:349.00, emoji:"🚁" },
+            { id:7, name:"ZYNX Hoodie (Black)", price:79.99, emoji:"👕" },
+            { id:8, name:"Futuristic Mug", price:24.99, emoji:"☕" }
+        ];
+        let cart = [];
+
+        function renderShopProducts() {
+            const container = document.getElementById('shop-products');
+            if(!container) return;
+            container.innerHTML = products.map(p=>`
+                <div class="product-card">
+                    <div class="product-emoji">${p.emoji}</div>
+                    <div class="product-title">${p.name}</div>
+                    <div class="product-price">$${p.price.toFixed(2)}</div>
+                    <button class="btn-add" onclick="addToCart(${p.id})">Add to Cart</button>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(id) {
+            const product = products.find(p=>p.id===id);
+            const existing = cart.find(i=>i.id===id);
+            if(existing) existing.quantity++;
+            else cart.push({...product, quantity:1});
+            updateCartUI();
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(i=>i.id!==id);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            document.getElementById('shop-cart-count').textContent = cart.reduce((s,i)=>s+i.quantity,0);
+            const itemsContainer = document.getElementById('cart-items');
+            itemsContainer.innerHTML = cart.map(i=>`
+                <div class="cart-item">
+                    <span>${i.emoji} ${i.name} (x${i.quantity})</span>
+                    <span>$${(i.price*i.quantity).toFixed(2)}</span>
+                    <button onclick="removeFromCart(${i.id})">✕</button>
+                </div>
+            `).join('');
+            document.getElementById('cart-total').textContent = '$'+cart.reduce((s,i)=>s+i.price*i.quantity,0).toFixed(2);
+        }
+
+        function toggleCart() {
+            document.getElementById('cart-panel').classList.toggle('open');
+            document.getElementById('cart-overlay').classList.toggle('show');
+        }
+
+        function checkout() {
+            if(cart.length===0){ alert('Cart is empty.'); return; }
+            alert(`Order placed! Total: $${cart.reduce((s,i)=>s+i.price*i.quantity,0).toFixed(2)} (Simulated)`);
+            cart = [];
+            updateCartUI();
+            toggleCart();
+        }
+
+        // Initialize shop products when shop page becomes active
+        const observer = new MutationObserver(()=>{
+            if(document.getElementById('page-shop').classList.contains('active')){
+                renderShopProducts();
+                updateCartUI();
+            }
+        });
+        observer.observe(document.getElementById('page-shop'), { attributes: true, attributeFilter: ['class'] });
+        window.addEventListener('load', ()=>{
+            if(document.getElementById('page-shop').classList.contains('active')) renderShopProducts();
+        });
+
+        // Reveal animations
+        const revealObs = new IntersectionObserver(entries=>{ entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }); }, {threshold:0.15});
+        document.querySelectorAll('.reveal').forEach(el=>revealObs.observe(el));
+        window.addEventListener('scroll',()=>{ document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>60); });
+
+        console.log('🚀 ZYNX with internal shop ready');
+    </script>
+</body>
+</html>
