@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nivas Supermarket – Dark Classic Theme</title>
+  <style>
+    :root {
+      --primary: #2b6f9c;        /* softer royal blue for dark bg */
+      --primary-light: #3a8bbf;
+      --accent: #d4a843;         /* classic gold */
+      --accent-hover: #c4962f;
+      --danger: #c0392b;
+      --danger-hover: #a93226;
+      --bg: #12181f;            /* deep dark background */
+      --card-bg: #1b232c;       /* dark card surface */
+      --text: #e0e6ec;
+      --text-light: #a0b0c0;
+      --border: #2a3540;
+      --shadow: 0 4px 16px rgba(0,0,0,0.4);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      background: #1b232c;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-top {
+      background: #0e1a24;
+      color: #d0dae6;
+      padding: 8px 0;
+      text-align: center;
+      font-size: 0.85rem;
+      letter-spacing: 0.3px;
+      border-bottom: 1px solid #2a3540;
+    }
+    .header-top span { color: var(--accent); font-weight: 700; }
+    .nav-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #e0e6ec;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon {
+      width: 44px; height: 44px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.4rem;
+    }
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .nav-links a, .nav-links button {
+      text-decoration: none;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 0.9rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.2s;
+      white-space: nowrap;
+      background: transparent;
+    }
+    .nav-links a:hover, .nav-links button:hover,
+    .nav-links a.active, .nav-links button.active {
+      background: #26323e;
+      color: #fff;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 22px;
+      border-radius: 24px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-outline { border: 2px solid var(--primary); color: var(--primary); background: transparent; }
+    .btn-outline:hover { background: var(--primary); color: #fff; }
+    .btn-primary { background: var(--primary); color: #fff; border: 2px solid var(--primary); }
+    .btn-primary:hover { background: var(--primary-light); border-color: var(--primary-light); }
+    .btn-accent { background: var(--accent); color: #1b232c; border: 2px solid var(--accent); font-weight: 700; }
+    .btn-accent:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: var(--danger-hover); }
+    .btn-sm { padding: 6px 14px; font-size: 0.8rem; border-radius: 18px; }
+    .cart-badge { position: relative; }
+    .cart-count {
+      position: absolute; top: -6px; right: -6px;
+      background: var(--danger); color: #fff;
+      font-size: 0.7rem; width: 20px; height: 20px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+    }
+
+    .main-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px;
+      flex: 1;
+      width: 100%;
+    }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .hero {
+      background: linear-gradient(135deg, #1e3140 0%, #263b4a 100%);
+      color: #fff;
+      padding: 52px 44px;
+      border-radius: var(--radius);
+      text-align: center;
+      margin-bottom: 36px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      border: 1px solid #2a3540;
+    }
+    .hero h1 { font-size: 2.4rem; font-weight: 800; }
+    .hero p { font-size: 1.1rem; opacity: 0.85; margin-top: 10px; }
+
+    .section-title {
+      font-size: 1.6rem; font-weight: 700; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+      color: #fff;
+    }
+    .section-title::after { content:''; flex:1; height:2px; background:var(--border); border-radius:1px; }
+
+    .category-tabs {
+      display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap;
+    }
+    .category-tab {
+      padding: 10px 24px; border-radius: 24px; cursor: pointer;
+      font-weight: 600; font-size: 0.9rem; border: 2px solid var(--border);
+      background: var(--card-bg); transition: 0.2s;
+      color: var(--text);
+    }
+    .category-tab:hover { border-color: var(--primary-light); color: #fff; }
+    .category-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 22px;
+      margin-bottom: 40px;
+    }
+    .product-card {
+      background: var(--card-bg); border-radius: var(--radius);
+      box-shadow: var(--shadow); overflow: hidden;
+      border: 1px solid var(--border);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.6); }
+    .product-img {
+      height: 180px; display: flex; align-items: center;
+      justify-content: center; font-size: 4rem; background: #212b35;
+      position: relative;
+    }
+    .product-badge {
+      position: absolute; top: 12px; left: 12px;
+      background: var(--accent); color: #1b232c; padding: 4px 12px;
+      border-radius: 20px; font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .product-info { padding: 18px 16px; }
+    .product-category-label {
+      font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--primary-light); font-weight: 700;
+    }
+    .product-name { font-weight: 700; font-size: 1rem; margin: 4px 0; color: #fff; }
+    .product-price { font-size: 1.25rem; font-weight: 800; color: var(--accent); }
+    .old-price { text-decoration: line-through; color: #6b7c8b; font-size: 0.85rem; margin-left: 6px; }
+    .product-actions { padding: 0 16px 18px; display: flex; gap: 8px; }
+    .product-actions .btn { flex:1; font-size:0.8rem; }
+
+    /* Cart page */
+    .cart-item {
+      display: flex; gap: 16px; align-items: center;
+      padding: 18px 0; border-bottom: 1px solid var(--border);
+      background: transparent;
+    }
+    .cart-item-icon { font-size: 2.8rem; width: 70px; text-align: center; }
+    .cart-item-details { flex:1; }
+    .cart-item-name { font-weight: 600; font-size: 1rem; color: #fff; }
+    .cart-item-price { color: var(--accent); font-weight: 700; }
+    .cart-item-qty { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+    .cart-item-qty button {
+      width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border);
+      background: #212b35; cursor: pointer; font-weight: 700; color: var(--text);
+    }
+    .cart-item-remove { color: var(--danger); cursor: pointer; margin-top: 6px; font-weight: 600; }
+    .cart-footer {
+      background: var(--card-bg); padding: 24px; border-radius: var(--radius);
+      box-shadow: var(--shadow); margin-top: 20px; border: 1px solid var(--border);
+    }
+    .cart-total {
+      display: flex; justify-content: space-between;
+      font-weight: 700; font-size: 1.2rem; margin-bottom: 18px;
+      color: #fff;
+    }
+
+    /* Checkout page */
+    .checkout-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+    }
+    @media (max-width: 768px) { .checkout-grid { grid-template-columns: 1fr; } }
+    .method-card {
+      border: 2px solid var(--border); border-radius: var(--radius-sm);
+      padding: 20px; text-align: center; cursor: pointer;
+      transition: 0.2s; background: #212b35; margin-bottom: 12px;
+      color: var(--text);
+    }
+    .method-card:hover { border-color: var(--primary-light); background: #26323e; }
+    .method-card.selected { border-color: var(--primary); background: #1e3140; box-shadow: 0 0 0 3px rgba(43,111,156,0.25); }
+    .method-icon { font-size: 2rem; margin-bottom: 8px; }
+    .method-name { font-weight: 700; font-size: 0.9rem; }
+    .method-desc { font-size: 0.75rem; color: var(--text-light); margin-top: 4px; }
+
+    .summary-box {
+      background: var(--card-bg); padding: 24px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    /* Form pages */
+    .form-page {
+      max-width: 500px; margin: 40px auto; background: var(--card-bg);
+      padding: 36px; border-radius: var(--radius); box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .form-page h2 { text-align: center; margin-bottom: 24px; color: #fff; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+    .form-group input, .form-group select {
+      width: 100%; padding: 12px 16px; border: 2px solid var(--border);
+      border-radius: var(--radius-sm); font-size: 0.95rem;
+      background: #212b35; color: #fff;
+    }
+    .form-row { display: flex; gap: 12px; }
+    .form-row .form-group { flex:1; }
+
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: #1e2b38; color: #fff; padding: 14px 24px;
+      border-radius: 30px; font-weight: 600; z-index: 999;
+      opacity: 0; transform: translateY(20px); transition: 0.3s;
+      pointer-events: none; box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    }
+    .toast.show { opacity:1; transform: translateY(0); }
+    .toast.success { background: #1a7a4c; }
+    .toast.error { background: #b52e31; }
+
+    .footer {
+      background: #0e1a24; color: #8a9ba8; text-align: center;
+      padding: 22px; margin-top: 44px; font-size: 0.85rem;
+      border-top: 1px solid #2a3540;
+    }
+    .footer span { color: var(--accent); font-weight: 600; }
+
+    /* Links in text */
+    a { color: var(--primary-light); }
+    a:hover { color: #fff; }
+    hr { border-color: var(--border); }
+  </style>
+</head>
+<body>
+  <!-- ========== HEADER ========== -->
+  <header class="header">
+    <div class="header-top">
+      🚚 <span>Free Delivery</span> on orders above $50 | ⚡ <span>Same-Day</span> delivery available
+    </div>
+    <nav class="nav-container">
+      <a href="#/home" class="logo" onclick="navigateTo('/home')">
+        <div class="logo-icon">🛒</div> Nivas<span style="color:#d4a843;">Mart</span>
+      </a>
+      <div class="nav-links" id="main-nav">
+        <a href="#/home" class="nav-home active" onclick="navigateTo('/home')">🏠 Home</a>
+        <a href="#/cart" class="nav-cart cart-badge" onclick="navigateTo('/cart')">
+          🛒 Cart <span class="cart-count" id="cart-count-badge">0</span>
+        </a>
+        <a href="#/checkout" class="nav-checkout" onclick="navigateTo('/checkout')">💳 Checkout</a>
+        <a href="#/login" class="nav-login" id="login-link" onclick="navigateTo('/login')">🔐 Sign In</a>
+        <a href="#/register" class="nav-register" id="register-link" onclick="navigateTo('/register')">📝 Register</a>
+        <button class="btn btn-danger btn-sm" id="logout-btn" style="display:none;" onclick="logout()">🚪 Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <div class="main-container">
+
+    <!-- HOME PAGE -->
+    <div id="page-home" class="page active">
+      <div class="hero">
+        <h1>🛍️ Welcome to Nivas Supermarket</h1>
+        <p>50+ products across Electronics • Clothes • Groceries – classic quality, now in dark mode</p>
+      </div>
+      <div class="category-tabs" id="category-tabs">
+        <button class="category-tab active" onclick="filterProducts('all', this)">🏷️ All</button>
+        <button class="category-tab" onclick="filterProducts('electronics', this)">📱 Electronics</button>
+        <button class="category-tab" onclick="filterProducts('clothes', this)">👕 Clothes</button>
+        <button class="category-tab" onclick="filterProducts('groceries', this)">🥑 Groceries</button>
+      </div>
+      <div id="products-container" class="products-grid"></div>
+    </div>
+
+    <!-- CART PAGE -->
+    <div id="page-cart" class="page">
+      <h2 class="section-title">🛒 Your Shopping Cart</h2>
+      <div id="cart-items-container"></div>
+      <div class="cart-footer" id="cart-footer" style="display:none;">
+        <div class="cart-total">
+          <span>Subtotal:</span>
+          <span id="cart-subtotal">$0.00</span>
+        </div>
+        <button class="btn btn-accent" style="width:100%;" onclick="navigateTo('/checkout')">💳 Proceed to Checkout</button>
+      </div>
+      <p id="cart-empty-msg" style="text-align:center;color:#6b7c8b;padding:40px;">Your cart is empty.</p>
+    </div>
+
+    <!-- CHECKOUT PAGE -->
+    <div id="page-checkout" class="page">
+      <h2 class="section-title">💳 Payment & Delivery</h2>
+      <div class="checkout-grid">
+        <div>
+          <h3 style="margin-bottom:12px; color:#fff;">💳 Payment Methods</h3>
+          <div id="payment-methods">
+            <div class="method-card selected" data-payment="credit-card" onclick="selectPayment(this)">💳<br>Credit/Debit Card</div>
+            <div class="method-card" data-payment="paypal" onclick="selectPayment(this)">🅿️<br>PayPal</div>
+            <div class="method-card" data-payment="mobile-money" onclick="selectPayment(this)">📱<br>Mobile Money</div>
+            <div class="method-card" data-payment="cash-on-delivery" onclick="selectPayment(this)">💵<br>Cash on Delivery</div>
+            <div class="method-card" data-payment="bank-transfer" onclick="selectPayment(this)">🏦<br>Bank Transfer</div>
+          </div>
+        </div>
+        <div>
+          <h3 style="margin-bottom:12px; color:#fff;">🚚 Delivery Options</h3>
+          <div id="delivery-methods">
+            <div class="method-card selected" data-delivery="standard" onclick="selectDelivery(this)">🚚<br>Standard ($5.99)</div>
+            <div class="method-card" data-delivery="express" onclick="selectDelivery(this)">⚡<br>Express ($12.99)</div>
+            <div class="method-card" data-delivery="same-day" onclick="selectDelivery(this)">🛵<br>Same-Day ($19.99)</div>
+            <div class="method-card" data-delivery="pickup" onclick="selectDelivery(this)">🏪<br>Store Pickup (Free)</div>
+            <div class="method-card" data-delivery="scheduled" onclick="selectDelivery(this)">📅<br>Scheduled ($7.99)</div>
+          </div>
+        </div>
+      </div>
+      <div class="summary-box" style="margin-top:20px;">
+        <div style="display:flex; justify-content:space-between; font-weight:700; color:#fff;">
+          <span>🛒 Cart Subtotal:</span> <span id="checkout-subtotal">$0.00</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:8px; color:var(--text);">
+          <span>💳 Payment:</span> <span id="checkout-payment">Credit/Debit Card</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; color:var(--text);">
+          <span>🚚 Delivery:</span> <span id="checkout-delivery">Standard ($5.99)</span>
+        </div>
+        <hr style="margin:12px 0;">
+        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.2rem; color:var(--accent);">
+          <span>💰 Estimated Total:</span> <span id="checkout-total">$5.99</span>
+        </div>
+        <button class="btn btn-accent" style="width:100%; margin-top:14px; padding:14px; font-size:1rem;" onclick="placeOrder()">✅ Place Order Now</button>
+      </div>
+    </div>
+
+    <!-- LOGIN PAGE -->
+    <div id="page-login" class="page">
+      <div class="form-page">
+        <h2>🔐 Sign In to Your Account</h2>
+        <form id="login-form" onsubmit="handleLogin(event)">
+          <div class="form-group"><label>Email</label><input type="email" id="login-email" required></div>
+          <div class="form-group"><label>Password</label><input type="password" id="login-password" required></div>
+          <button type="submit" class="btn btn-primary" style="width:100%; padding:12px;">Sign In</button>
+        </form>
+        <p style="text-align:center; margin-top:18px; color:var(--text);">Don't have an account? <a href="#/register" onclick="navigateTo('/register')" style="color:var(--accent); font-weight:600;">Register here</a></p>
+      </div>
+    </div>
+
+    <!-- REGISTER PAGE -->
+    <div id="page-register" class="page">
+      <div class="form-page">
+        <h2>📝 Create Your Account</h2>
+        <form id="register-form" onsubmit="handleRegister(event)">
+          <div class="form-row">
+            <div class="form-group"><label>First Name</label><input type="text" id="reg-firstname" required></div>
+            <div class="form-group"><label>Last Name</label><input type="text" id="reg-lastname" required></div>
+          </div>
+          <div class="form-group"><label>Email</label><input type="email" id="reg-email" required></div>
+          <div class="form-group"><label>Phone</label><input type="tel" id="reg-phone" required></div>
+          <div class="form-group"><label>Password</label><input type="password" id="reg-password" minlength="6" required></div>
+          <div class="form-group"><label>Confirm Password</label><input type="password" id="reg-confirm" minlength="6" required></div>
+          <button type="submit" class="btn btn-primary" style="width:100%; padding:12px;">Register</button>
+        </form>
+        <p style="text-align:center; margin-top:18px; color:var(--text);">Already have an account? <a href="#/login" onclick="navigateTo('/login')" style="color:var(--accent); font-weight:600;">Sign In</a></p>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <p>&copy; 2026 <span>Nivas Supermarket</span>. All rights reserved. | 📍 123 Market Street, Nairobi</p>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ========== EXPANDED PRODUCT DATA (50 items) ==========
+    const products = [
+      { id:1, name:'Wireless Headphones', category:'electronics', price:49.99, oldPrice:69.99, icon:'🎧', badge:'SALE' },
+      { id:2, name:'Smart LED TV 43"', category:'electronics', price:349.99, oldPrice:429.99, icon:'📺', badge:'HOT' },
+      { id:3, name:'USB-C Fast Charger', category:'electronics', price:24.99, icon:'🔌' },
+      { id:4, name:'Power Bank 20000mAh', category:'electronics', price:34.99, oldPrice:44.99, icon:'🔋', badge:'NEW' },
+      { id:5, name:'Ergonomic Mouse', category:'electronics', price:19.99, icon:'🖱️' },
+      { id:6, name:'Laptop Stand', category:'electronics', price:39.99, oldPrice:54.99, icon:'💻', badge:'SALE' },
+      { id:7, name:'Bluetooth Speaker', category:'electronics', price:59.99, oldPrice:79.99, icon:'🔊', badge:'HOT' },
+      { id:8, name:'Tablet 10.5"', category:'electronics', price:279.99, icon:'📱' },
+      { id:9, name:'Digital Camera', category:'electronics', price:199.99, oldPrice:249.99, icon:'📷', badge:'SALE' },
+      { id:10, name:'Smartwatch', category:'electronics', price:129.99, icon:'⌚', badge:'NEW' },
+      { id:11, name:'Wireless Keyboard', category:'electronics', price:29.99, oldPrice:39.99, icon:'⌨️', badge:'SALE' },
+      { id:12, name:'External Hard Drive 1TB', category:'electronics', price:54.99, icon:'💾' },
+      { id:13, name:'Webcam HD 1080p', category:'electronics', price:44.99, icon:'📹' },
+      { id:14, name:'USB Hub 4-Port', category:'electronics', price:12.99, oldPrice:19.99, icon:'🔗', badge:'VALUE' },
+      { id:15, name:'Noise Cancelling Earbuds', category:'electronics', price:89.99, icon:'🎵', badge:'HOT' },
+      { id:16, name:'Portable Projector', category:'electronics', price:219.99, oldPrice:269.99, icon:'📽️', badge:'NEW' },
+      { id:17, name:'Cotton T-Shirt', category:'clothes', price:18.99, oldPrice:24.99, icon:'👕', badge:'SALE' },
+      { id:18, name:'Slim Fit Jeans', category:'clothes', price:44.99, icon:'👖' },
+      { id:19, name:'Fleece Hoodie', category:'clothes', price:32.99, oldPrice:39.99, icon:'🧥', badge:'HOT' },
+      { id:20, name:'Summer Dress', category:'clothes', price:27.99, icon:'👗', badge:'NEW' },
+      { id:21, name:'Running Sneakers', category:'clothes', price:59.99, oldPrice:74.99, icon:'👟', badge:'SALE' },
+      { id:22, name:'Leather Belt', category:'clothes', price:15.99, icon:'🪢' },
+      { id:23, name:'Denim Jacket', category:'clothes', price:64.99, oldPrice:79.99, icon:'🧥', badge:'SALE' },
+      { id:24, name:'Chino Shorts', category:'clothes', price:24.99, icon:'🩳' },
+      { id:25, name:'Striped Polo Shirt', category:'clothes', price:22.99, icon:'👔', badge:'NEW' },
+      { id:26, name:'Wool Scarf', category:'clothes', price:19.99, oldPrice:24.99, icon:'🧣', badge:'SALE' },
+      { id:27, name:'Baseball Cap', category:'clothes', price:12.99, icon:'🧢' },
+      { id:28, name:'Ankle Socks (6-pack)', category:'clothes', price:9.99, icon:'🧦', badge:'VALUE' },
+      { id:29, name:'Formal Blazer', category:'clothes', price:89.99, oldPrice:109.99, icon:'🤵', badge:'HOT' },
+      { id:30, name:'Yoga Pants', category:'clothes', price:29.99, icon:'🧘' },
+      { id:31, name:'Leather Gloves', category:'clothes', price:21.99, icon:'🧤', badge:'NEW' },
+      { id:32, name:'Maxi Skirt', category:'clothes', price:34.99, icon:'👗' },
+      { id:33, name:'Winter Beanie', category:'clothes', price:8.99, oldPrice:11.99, icon:'🎩', badge:'SALE' },
+      { id:34, name:'Organic Bananas 1kg', category:'groceries', price:2.49, oldPrice:3.29, icon:'🍌', badge:'FRESH' },
+      { id:35, name:'Whole Milk 2L', category:'groceries', price:3.99, icon:'🥛' },
+      { id:36, name:'Brown Bread Loaf', category:'groceries', price:2.29, oldPrice:2.79, icon:'🍞', badge:'SALE' },
+      { id:37, name:'Free-Range Eggs 12pk', category:'groceries', price:5.99, icon:'🥚' },
+      { id:38, name:'Avocados 3pk', category:'groceries', price:4.49, oldPrice:5.99, icon:'🥑', badge:'FRESH' },
+      { id:39, name:'Jasmine Rice 5kg', category:'groceries', price:12.99, icon:'🍚', badge:'VALUE' },
+      { id:40, name:'Ground Coffee', category:'groceries', price:8.99, oldPrice:10.99, icon:'☕', badge:'HOT' },
+      { id:41, name:'Tomatoes 500g', category:'groceries', price:1.99, icon:'🍅' },
+      { id:42, name:'Pasta Spaghetti', category:'groceries', price:1.79, oldPrice:2.29, icon:'🍝', badge:'SALE' },
+      { id:43, name:'Cheddar Cheese Block', category:'groceries', price:6.49, icon:'🧀' },
+      { id:44, name:'Chicken Breast 1kg', category:'groceries', price:9.99, oldPrice:12.49, icon:'🍗', badge:'FRESH' },
+      { id:45, name:'Frozen Peas 500g', category:'groceries', price:2.19, icon:'🟢' },
+      { id:46, name:'Orange Juice 1L', category:'groceries', price:3.49, icon:'🍊', badge:'NEW' },
+      { id:47, name:'Dark Chocolate Bar', category:'groceries', price:2.99, oldPrice:3.99, icon:'🍫', badge:'SALE' },
+      { id:48, name:'Honey Jar 500g', category:'groceries', price:7.99, icon:'🍯' },
+      { id:49, name:'Greek Yogurt 1kg', category:'groceries', price:5.49, icon:'🥣', badge:'FRESH' },
+      { id:50, name:'Mixed Nuts 400g', category:'groceries', price:8.49, oldPrice:10.49, icon:'🥜', badge:'VALUE' }
+    ];
+
+    // ========== STATE ==========
+    let cart = JSON.parse(localStorage.getItem('nivasCart')) || [];
+    let currentUser = JSON.parse(localStorage.getItem('nivasUser')) || null;
+    let selectedPayment = 'credit-card';
+    let selectedDelivery = 'standard';
+    let currentProductFilter = 'all';
+
+    const deliveryPrices = {
+      standard: { name:'Standard Delivery', price:5.99 },
+      express: { name:'Express Delivery', price:12.99 },
+      'same-day': { name:'Same-Day Delivery', price:19.99 },
+      pickup: { name:'Store Pickup', price:0 },
+      scheduled: { name:'Scheduled Delivery', price:7.99 }
+    };
+    const paymentNames = {
+      'credit-card':'Credit/Debit Card', 'paypal':'PayPal', 'mobile-money':'Mobile Money',
+      'cash-on-delivery':'Cash on Delivery', 'bank-transfer':'Bank Transfer'
+    };
+
+    // ========== ROUTING ==========
+    function navigateTo(path) { window.location.hash = path; }
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      const page = document.getElementById(`page-${pageId}`);
+      if (page) page.classList.add('active');
+      document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+      const navLink = document.querySelector(`.nav-${pageId}`);
+      if (navLink) navLink.classList.add('active');
+      if (pageId === 'home') document.querySelector('.nav-home')?.classList.add('active');
+    }
+    function handleRouting() {
+      const hash = window.location.hash.slice(1) || '/home';
+      const page = hash.replace('/', '');
+      if (['home','cart','checkout','login','register'].includes(page)) {
+        showPage(page);
+        if (page === 'home') renderProducts(currentProductFilter);
+        if (page === 'cart') renderCartPage();
+        if (page === 'checkout') updateCheckoutPage();
+      } else { navigateTo('/home'); }
+    }
+    window.addEventListener('hashchange', handleRouting);
+    window.addEventListener('load', () => { handleRouting(); updateAuthUI(); updateCartCount(); });
+
+    // ========== HOME PAGE ==========
+    function renderProducts(filter = 'all') {
+      currentProductFilter = filter;
+      const container = document.getElementById('products-container');
+      if (!container) return;
+      const filtered = filter === 'all' ? products : products.filter(p => p.category === filter);
+      container.innerHTML = filtered.map(p => `
+        <div class="product-card">
+          <div class="product-img">${p.icon} ${p.badge?`<span class="product-badge">${p.badge}</span>`:''}</div>
+          <div class="product-info">
+            <span class="product-category-label">${p.category}</span>
+            <span class="product-name">${p.name}</span>
+            <span class="product-price">$${p.price.toFixed(2)} ${p.oldPrice?`<span class="old-price">$${p.oldPrice.toFixed(2)}</span>`:''}</span>
+          </div>
+          <div class="product-actions">
+            <button class="btn btn-outline btn-sm" onclick="addToCart(${p.id})">🛒 Add</button>
+            <button class="btn btn-primary btn-sm" onclick="buyNow(${p.id})">⚡ Buy</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    function filterProducts(category, btn) {
+      document.querySelectorAll('#category-tabs .category-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      renderProducts(category);
+    }
+
+    // ========== CART ==========
+    function addToCart(productId) {
+      const product = products.find(p => p.id === productId);
+      if (!product) return;
+      const existing = cart.find(item => item.id === productId);
+      if (existing) existing.qty += 1;
+      else cart.push({ id:productId, name:product.name, price:product.price, icon:product.icon, qty:1, category:product.category });
+      saveCart(); updateCartCount(); showToast(`${product.name} added! ✅`);
+    }
+    function buyNow(productId) { addToCart(productId); navigateTo('/cart'); }
+    function removeFromCart(productId) {
+      cart = cart.filter(item => item.id !== productId);
+      saveCart(); updateCartCount(); renderCartPage(); showToast('Item removed.', 'error');
+    }
+    function changeQty(productId, delta) {
+      const item = cart.find(i => i.id === productId);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) { removeFromCart(productId); return; }
+      saveCart(); updateCartCount(); renderCartPage();
+    }
+    function saveCart() { localStorage.setItem('nivasCart', JSON.stringify(cart)); }
+    function getCartTotal() { return cart.reduce((sum, i) => sum + i.price * i.qty, 0); }
+    function getCartCount() { return cart.reduce((sum, i) => sum + i.qty, 0); }
+    function updateCartCount() { const badge = document.getElementById('cart-count-badge'); if (badge) badge.textContent = getCartCount(); }
+    function renderCartPage() {
+      const container = document.getElementById('cart-items-container');
+      const footer = document.getElementById('cart-footer');
+      const emptyMsg = document.getElementById('cart-empty-msg');
+      const subtotalEl = document.getElementById('cart-subtotal');
+      if (!container) return;
+      if (cart.length === 0) {
+        container.innerHTML = ''; footer.style.display = 'none'; emptyMsg.style.display = 'block'; subtotalEl.textContent = '$0.00';
+      } else {
+        emptyMsg.style.display = 'none'; footer.style.display = 'block';
+        container.innerHTML = cart.map(item => `
+          <div class="cart-item">
+            <div class="cart-item-icon">${item.icon||'📦'}</div>
+            <div class="cart-item-details">
+              <div class="cart-item-name">${item.name}</div>
+              <div class="cart-item-price">$${(item.price*item.qty).toFixed(2)}</div>
+              <div class="cart-item-qty">
+                <button onclick="changeQty(${item.id},-1)">−</button>
+                <span>${item.qty}</span>
+                <button onclick="changeQty(${item.id},1)">+</button>
+              </div>
+              <div class="cart-item-remove" onclick="removeFromCart(${item.id})">🗑 Remove</div>
+            </div>
+          </div>
+        `).join('');
+        subtotalEl.textContent = `$${getCartTotal().toFixed(2)}`;
+      }
+    }
+
+    // ========== CHECKOUT ==========
+    function selectPayment(card) {
+      document.querySelectorAll('#payment-methods .method-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected'); selectedPayment = card.dataset.payment; updateCheckoutPage();
+    }
+    function selectDelivery(card) {
+      document.querySelectorAll('#delivery-methods .method-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected'); selectedDelivery = card.dataset.delivery; updateCheckoutPage();
+    }
+    function updateCheckoutPage() {
+      const subtotal = getCartTotal();
+      const delivery = deliveryPrices[selectedDelivery];
+      const total = subtotal + (delivery?.price||0);
+      document.getElementById('checkout-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+      document.getElementById('checkout-payment').textContent = paymentNames[selectedPayment];
+      document.getElementById('checkout-delivery').textContent = delivery ? `${delivery.name} ($${delivery.price.toFixed(2)})` : '';
+      document.getElementById('checkout-total').textContent = `$${total.toFixed(2)}`;
+    }
+    function placeOrder() {
+      if (cart.length === 0) return showToast('Cart is empty!', 'error');
+      if (!currentUser) { showToast('Please sign in first.', 'error'); return navigateTo('/login'); }
+      const delivery = deliveryPrices[selectedDelivery];
+      const total = getCartTotal() + (delivery?.price||0);
+      alert(`✅ Order Placed!\n\nCustomer: ${currentUser.firstName} ${currentUser.lastName}\nPayment: ${paymentNames[selectedPayment]}\nDelivery: ${delivery?.name}\nTotal: $${total.toFixed(2)}\n\nThank you!`);
+      cart = []; saveCart(); updateCartCount(); renderCartPage(); navigateTo('/home');
+      showToast('Order placed successfully! 🎉', 'success');
+    }
+
+    // ========== AUTH ==========
+    function handleRegister(e) {
+      e.preventDefault();
+      const user = {
+        firstName: document.getElementById('reg-firstname').value.trim(),
+        lastName: document.getElementById('reg-lastname').value.trim(),
+        email: document.getElementById('reg-email').value.trim(),
+        phone: document.getElementById('reg-phone').value.trim(),
+        password: document.getElementById('reg-password').value
+      };
+      if (user.password !== document.getElementById('reg-confirm').value) return showToast('Passwords mismatch', 'error');
+      if (user.password.length < 6) return showToast('Password too short', 'error');
+      localStorage.setItem('nivasUser', JSON.stringify(user));
+      currentUser = user; updateAuthUI(); navigateTo('/home'); showToast(`Welcome, ${user.firstName}!`);
+    }
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const pwd = document.getElementById('login-password').value;
+      const saved = JSON.parse(localStorage.getItem('nivasUser'));
+      if (!saved || saved.email !== email || saved.password !== pwd) return showToast('Invalid credentials', 'error');
+      currentUser = saved; updateAuthUI(); navigateTo('/home'); showToast(`Welcome back, ${saved.firstName}!`);
+    }
+    function logout() { currentUser = null; localStorage.removeItem('nivasUser'); updateAuthUI(); navigateTo('/home'); showToast('Logged out.'); }
+    function updateAuthUI() {
+      const loginLink = document.getElementById('login-link');
+      const registerLink = document.getElementById('register-link');
+      const logoutBtn = document.getElementById('logout-btn');
+      if (currentUser) {
+        loginLink.style.display = 'none'; registerLink.style.display = 'none';
+        logoutBtn.style.display = 'inline-flex'; logoutBtn.textContent = `👤 ${currentUser.firstName} | Logout`;
+      } else {
+        loginLink.style.display = 'inline-block'; registerLink.style.display = 'inline-block';
+        logoutBtn.style.display = 'none';
+      }
+    }
+
+    function showToast(msg, type='success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg; toast.className = `toast ${type} show`;
+      clearTimeout(toast._timeout); toast._timeout = setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    updateAuthUI(); updateCartCount();
+  </script>
+</body>
+</html>
